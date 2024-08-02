@@ -1,4 +1,7 @@
+import time
+
 import pyfiglet
+import rich.console
 from rich import print
 def print_banner():
     title = pyfiglet.figlet_format('L I V E',font="epic")
