@@ -31,9 +31,22 @@ def main():
         print("attention it may slow down your pc\n")
         run(args.input_gif, filePath)
 
-
+def get_avg_fps(PIL_Image_object):
+    """
+    Returns the average framerate of a PIL Image object
+    """
+    PIL_Image_object.seek(0)
+    frames = duration = 0
+    while True:
+        try:
+            frames += 1
+            duration += PIL_Image_object.info['duration']
+            PIL_Image_object.seek(PIL_Image_object.tell() + 1)
+        except EOFError:
+            return frames / duration * 1000
 def run(image_path, output_path):
     im = Image.open(image_path)
+    f=get_avg_fps(im)
     ctypes.windll.user32.SystemParametersInfoW(20, 0, output_path, 3)
     while True:
         for i in range(im.n_frames):
@@ -41,7 +54,7 @@ def run(image_path, output_path):
                 im.seek(i)
                 im.save(output_path)
                 os.system("RUNDLL32.EXE USER32.DLL,UpdatePerUserSystemParameters 1, True")
-                time.sleep(0.1)
+                time.sleep(1/f)
             except KeyboardInterrupt:
                 im.close()
                 rich.print("\n[yellow]GoodBye[/yellow]")
